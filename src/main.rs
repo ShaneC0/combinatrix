@@ -1,13 +1,18 @@
 fn main() {
-    let sample = String::from("Hello, world!");
+    let sample = String::from("Hello, world");
 
-    let hello_parser = c_sequence(vec![
-        c_char('H'),
-    ]);
+    let hello = c_string("Hello,");
+    let world = c_string("world");
+    let c = c_sequence(vec![hello, world]);
 
-    match hello_parser(&sample) {
-        Ok((x, _)) => println!("Ok {}", x),
-        Err(x) => println!("Err {}", x)
+
+
+
+
+    let result = c(&sample);
+    match result {
+        Ok((x, _)) => println!("OK {}", x),
+        Err(e) => println!("ERR {}", e)
     }
 }
 
@@ -18,21 +23,6 @@ fn c_char(c: char) -> impl Fn(&str) -> Result<(&str, ()), &str> {
         } else {
             Err(input)
         }
-    }
-}
-
-fn c_or<T>(parser_a: T, parser_b: T) -> impl Fn(&str) -> Result<(&str, ()), &str>
-where
-    T: Fn(&str) -> Result<(&str, ()), &str>,
-{
-    move |input: &str| -> Result<(&str, ()), &str> {
-        if let Ok(x) = parser_a(input) {
-            return Ok(x);
-        }
-        if let Ok(x) = parser_b(input) {
-            return Ok(x);
-        }
-        Err(input)
     }
 }
 
@@ -51,4 +41,26 @@ where
         }
         Ok((remaining, ()))
     }
+}
+
+fn c_choice<T>(parsers: Vec<T>) -> impl Fn(&str) -> Result<(&str, ()), &str>
+where
+    T: Fn(&str) -> Result<(&str, ()), &str>
+{
+    move |input: &str| -> Result<(&str, ()), &str> {
+        for parser in &parsers {
+            if let Ok(x) = parser(input) {
+                return Ok(x);
+            }
+        }
+        Err(input)
+    }
+}
+
+fn c_string(target: &str) -> impl Fn(&str) -> Result<(&str, ()), &str> {
+    let mut parsers = vec![];
+    for letter in target.chars() {
+        parsers.push(c_char(letter));
+    }
+    c_sequence(parsers)
 }
