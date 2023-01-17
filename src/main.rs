@@ -64,3 +64,11 @@ fn c_string(target: &str) -> impl Fn(&str) -> Result<(&str, ()), &str> {
     }
     c_sequence(parsers)
 }
+
+fn c_whitespace() -> impl Fn(&str) -> Result<(&str, ()), &str> {
+    c_choice(vec![
+        c_char(' '),
+        c_char('\n'),
+        c_char('\t')
+    ])
+}
