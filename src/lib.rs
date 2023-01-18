@@ -1,5 +1,3 @@
-
-
 pub type Parser<'a> = Box<dyn Fn(&'a str) -> Result<(&'a str, Vec<char>), &'a str> + 'a>;
 
 pub fn c_char<'a>(c: char) -> Parser<'a> {
@@ -15,17 +13,19 @@ pub fn c_char<'a>(c: char) -> Parser<'a> {
 }
 
 pub fn c_letter<'a>() -> Parser<'a> {
-    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-        if input.chars().next().unwrap().is_alphabetic() {
-            Ok((&input[1..], vec![input.chars().next().unwrap()]))
-        } else {
-            Err(input)
-        }
-    })
+    Box::new(
+        move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
+            if input.chars().next().unwrap().is_alphabetic() {
+                Ok((&input[1..], vec![input.chars().next().unwrap()]))
+            } else {
+                Err(input)
+            }
+        },
+    )
 }
 
 pub fn c_digit<'a>() -> Parser<'a> {
-    Box::new(move |input: &str| -> Result<(&str, Vec<char>), &str> {
+    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
         if input.chars().next().unwrap().is_numeric() {
             Ok((&input[1..], vec![input.chars().next().unwrap()]))
         } else {
@@ -35,30 +35,34 @@ pub fn c_digit<'a>() -> Parser<'a> {
 }
 
 pub fn c_sequence<'a>(parsers: Vec<Parser<'a>>) -> Parser<'a> {
-    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-        let mut remaining = &input[..];
-        let mut matched = vec![];
-        for parser in &parsers {
-            if let Ok((rem, mut matched_char)) = parser(remaining) {
-                remaining = rem;
-                matched.append(&mut matched_char);
-            } else {
-                return Err(input);
+    Box::new(
+        move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
+            let mut remaining = &input[..];
+            let mut matched = vec![];
+            for parser in &parsers {
+                if let Ok((rem, mut matched_char)) = parser(remaining) {
+                    remaining = rem;
+                    matched.append(&mut matched_char);
+                } else {
+                    return Err(input);
+                }
             }
-        }
-        Ok((remaining, matched))
-    })
+            Ok((remaining, matched))
+        },
+    )
 }
 
 pub fn c_choice<'a>(parsers: Vec<Parser<'a>>) -> Parser<'a> {
-    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-        for parser in &parsers {
-            if let Ok(x) = parser(input) {
-                return Ok(x);
+    Box::new(
+        move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
+            for parser in &parsers {
+                if let Ok(x) = parser(input) {
+                    return Ok(x);
+                }
             }
-        }
-        Err(input)
-    })
+            Err(input)
+        },
+    )
 }
 
 pub fn c_string<'a>(target: &'a str) -> Parser<'a> {
@@ -70,15 +74,17 @@ pub fn c_string<'a>(target: &'a str) -> Parser<'a> {
 }
 
 pub fn c_repeat<'a>(parser: Parser<'a>) -> Parser<'a> {
-    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-        let mut remaining = &input[..];
-        let mut matched = vec![];
-        while let Ok((rem, mut matched_char)) = parser(remaining) {
-            remaining = rem;
-            matched.append(&mut matched_char)
-        }
-        Ok((remaining, matched))
-    })
+    Box::new(
+        move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
+            let mut remaining = &input[..];
+            let mut matched = vec![];
+            while let Ok((rem, mut matched_char)) = parser(remaining) {
+                remaining = rem;
+                matched.append(&mut matched_char)
+            }
+            Ok((remaining, matched))
+        },
+    )
 }
 
 pub fn c_whitespace<'a>() -> Parser<'a> {
