@@ -13,7 +13,7 @@ fn main() {
     let ident = c_repeat(c_choice(vec![c_letter(), c_char('_')]));
     let semicol = c_char(';');
 
-    let sample = "1025";
+    let sample = "1026";
     let parser = c_repeat(c_digit());
     match parser(&sample) {
         Ok((remaining, matched)) => println!(

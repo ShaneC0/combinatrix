@@ -15,7 +15,7 @@ pub fn c_char<'a>(c: char) -> Parser<'a> {
 pub fn c_letter<'a>() -> Parser<'a> {
     Box::new(
         move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-            if input.chars().next().unwrap().is_alphabetic() {
+            if input.len() > 0 && input.chars().next().unwrap().is_alphabetic() {
                 Ok((&input[1..], vec![input.chars().next().unwrap()]))
             } else {
                 Err(input)
@@ -25,13 +25,15 @@ pub fn c_letter<'a>() -> Parser<'a> {
 }
 
 pub fn c_digit<'a>() -> Parser<'a> {
-    Box::new(move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
-        if input.chars().next().unwrap().is_numeric() {
-            Ok((&input[1..], vec![input.chars().next().unwrap()]))
-        } else {
-            Err(input)
-        }
-    })
+    Box::new(
+        move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
+            if input.len() > 0 && input.chars().next().unwrap().is_numeric() {
+                Ok((&input[1..], vec![input.chars().next().unwrap()]))
+            } else {
+                Err(input)
+            }
+        },
+    )
 }
 
 pub fn c_sequence<'a>(parsers: Vec<Parser<'a>>) -> Parser<'a> {
