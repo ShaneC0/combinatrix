@@ -1,11 +1,7 @@
 fn main() {
     let sample = String::from("Hello, world");
 
-    
-    let hello = c_string("Hello");
-    let world = c_string("world");
-    let sample_parser = c_sequence(vec![hello, world]);
-
+    let sample_parser = c_repeat(c_choice(vec![c_char('H'), c_char('e')]));
 
     let result = sample_parser(&sample);
 
@@ -49,7 +45,7 @@ where
 
 fn c_choice<T>(parsers: Vec<T>) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str>
 where
-    T: Fn(&str) -> Result<(&str, Vec<char>), &str>
+    T: Fn(&str) -> Result<(&str, Vec<char>), &str>,
 {
     move |input: &str| -> Result<(&str, Vec<char>), &str> {
         for parser in &parsers {
@@ -69,9 +65,9 @@ fn c_string(target: &str) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str> {
     c_sequence(parsers)
 }
 
-fn c_repeat<T>(parser: T) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str> 
+fn c_repeat<T>(parser: T) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str>
 where
-    T: Fn(&str) -> Result<(&str, Vec<char>), &str>
+    T: Fn(&str) -> Result<(&str, Vec<char>), &str>,
 {
     move |input: &str| -> Result<(&str, Vec<char>), &str> {
         let mut remaining = &input[..];
@@ -81,13 +77,9 @@ where
             matched.append(&mut matched_char)
         }
         Ok((remaining, matched))
-    }    
+    }
 }
 
 fn c_whitespace() -> impl Fn(&str) -> Result<(&str, Vec<char>), &str> {
-    c_choice(vec![
-        c_char(' '),
-        c_char('\n'),
-        c_char('\t')
-    ])
+    c_choice(vec![c_char(' '), c_char('\n'), c_char('\t')])
 }
