@@ -11,6 +11,7 @@ fn main() {
     let init = c_string("init");
     let halt = c_string("halt");
     let ident = c_repeat(c_choice(vec![c_letter(), c_char('_')]));
+    let integer = c_repeat(c_digit());
     let semicol = c_char(';');
 
     let sample = "1026";
