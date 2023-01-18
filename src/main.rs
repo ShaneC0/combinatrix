@@ -1,9 +1,14 @@
 fn main() {
     let sample = String::from("Hello, world");
 
-    let c = c_repeat(c_char('H'));
+    
+    let hello = c_string("Hello");
+    let world = c_string("world");
+    let sample_parser = c_sequence(vec![hello, world]);
 
-    let result = c(&sample);
+
+    let result = sample_parser(&sample);
+
     match result {
         Ok((remaining, matched)) => println!(
             "OK:\nRemaining input: {}\nMatched chars: {:?}",
