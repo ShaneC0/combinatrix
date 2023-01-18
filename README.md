@@ -2,11 +2,11 @@
 
 Parser combinator library in rust. 
 
-What is the return type of a parser?
-    - Another Parser?
-    - Result with another parser?
+one or more,
+zero or more
 
+between
 
-c_repeat function
+map
 
-what if every fn returns a vector of characters?
+apply
