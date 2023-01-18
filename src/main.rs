@@ -1,9 +1,8 @@
 fn main() {
     let sample = String::from("Hello, world");
 
-    let sample_parser = c_repeat(c_choice(vec![c_char('H'), c_char('e')]));
 
-    let result = sample_parser(&sample);
+    let result = letter(&sample);
 
     match result {
         Ok((remaining, matched)) => println!(
@@ -23,6 +22,14 @@ fn c_char(c: char) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str> {
         }
     }
 }
+
+fn letter(input: &str) -> Result<(&str, Vec<char>), &str> {
+    if input.chars().next().unwrap().is_alphabetic() {
+        Ok((&input[1..], vec![input.chars().next().unwrap()]))
+    } else {
+        Err(input)
+    }
+} 
 
 fn c_sequence<T>(parsers: Vec<T>) -> impl Fn(&str) -> Result<(&str, Vec<char>), &str>
 where
