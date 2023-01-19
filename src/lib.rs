@@ -75,7 +75,7 @@ pub fn c_string<'a>(target: &'a str) -> Parser<'a> {
     c_sequence(parsers)
 }
 
-pub fn c_repeat<'a>(parser: Parser<'a>) -> Parser<'a> {
+pub fn c_zero_or_more<'a>(parser: Parser<'a>) -> Parser<'a> {
     Box::new(
         move |input: &'a str| -> Result<(&'a str, Vec<char>), &'a str> {
             let mut remaining = &input[..];
@@ -89,6 +89,10 @@ pub fn c_repeat<'a>(parser: Parser<'a>) -> Parser<'a> {
     )
 }
 
+pub fn c_one_or_more<'a>(parser: Parser<'a>) -> Parser<'a> {
+    c_sequence(vec![parser, c_zero_or_more(parser)])
+}
+
 pub fn c_whitespace<'a>() -> Parser<'a> {
-    c_repeat(c_choice(vec![c_char(' '), c_char('\n'), c_char('\t')]))
+    c_zero_or_more(c_choice(vec![c_char(' '), c_char('\n'), c_char('\t')]))
 }
